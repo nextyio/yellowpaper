@@ -1,0 +1,68 @@
+% !TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt]{amsart}
+\usepackage{cancel}
+\usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{subfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[a4paper,width=170mm,top=18mm,bottom=22mm,includeheadfoot]{geometry}
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage{caption}
+\usepackage{natbib}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{mathtools}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{afterpage}
+\usepackage{tikz}
+\usepackage[bookmarks=true, unicode=true, pdftitle={Nexty Yellow Paper: a formal specification of Nexty, a zero transfer fee and instant transfer base on Ethereum blockchain}, pdfauthor={Thanh Dao / Ha Dang},pdfkeywords={Nexty, Ethereum, Yellow Paper, blockchain, virtual machine, cryptography, decentralised, singleton, transaction, generalised, zero transfer fee, instant transfer},pdfborder={0 0 0.5 [1 3]}]{hyperref}
+%,pagebackref=true
+
+\usepackage{tabu} %requires array.
+
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+
+\definecolor{pagecolor}{rgb}{1,0.98,0.9}
+
+\title{NEXTY: AN ALTERNATIVE CONSENSUS TO GET ZERO TRANSFER FEE AND INSTANT TRANSFER FROM ETHEREUM BLOCKCHAIN}
+\author{
+	Thanh Dao / Ha Dang \\
+	CO-FOUNDER/CTO NEXTY PLATFORM \\
+	thanhdao@nexty.io
+}
+\date{} % delete this line to display the current date
+
+%%% BEGIN DOCUMENT
+\begin{document}
+
+\pagecolor{pagecolor}
+\begin{abstract}
+Đây là phần mô tả mang tính kỹ thuật của Nexty Platform, tập trung vào việc chi tiết cách thức vận hành của Consensus Protocol tên là Proof of Foundation (Algorithm name: DCCS - Dual Cryptocurrency Confirmation System). Proof of Foundation được inspired từ Proof of Authority được đề xuất bởi \cite{clique}, nhưng vận hành theo DCCS để có được tính decentralized hoàn thiện hơn và đồng thời mang lại sự incentive cho những người duy trì blockchain.
+\end{abstract}
+
+\maketitle
+
+\setlength{\columnsep}{20pt}
+\begin{multicols}{2}
+%\tableofcontents
+
+\section{Mô tả chung}\label{sec:introduction}
+DCCS là hệ thống có thêm 1 token thứ 2 tên là NTF ngoài NTY. NTF là token dùng để xác định Authorities duy trì confirmation system, đồng thời cũng xác định số lượng trả thưởng cho việc đóng Blocks. NTF là token có số lượng 10,000,000 được tặng tương ứng với 100,000,000,000 NTY đầu tiên tham gia chương trình smart staking của Nexty, hay có thể nói là những người đầu tiên có tầm nhìn và tâm huyết với hệ thống của Nexty. Chính vì thế Consensus Protocol được đặt tên là Proof of Foundation. Tuy nhiên, sức mạnh của hệ thống lại không nằm ở những người sở hữu NTF vì họ có thể bị vote down trong những trường hợp như phát hiện gian lận, quá centralized, hay không cập nhật kịp thời những source code mới từ hệ thống. Chính vì vậy, ở một khía cạnh khác có thể nói những người sở hữu NTF là những người đi làm thuê cho hệ thống, và bản thân họ không phải là những người chủ thực sự của Nexty Blockchain. Đây là một decentralized system mới, được duy trì từ những người sở hữu NTY.
+
+\section{Cách thức authorize một account được trở thành block sealer}
+Hệ thống sẽ đặt ra parametter xem giá trị tối thiểu mà địa chỉ NTF phải có để có thể trở thành 1 sealer. Sẽ có 1 smart contract, trong đó chỉ định gán quyền của 1 địa chỉ NTF với số lượng token lớn hơn min-ntf, sang 1 địa chỉ Account khác gọi là executing-account với giá trị state là authorized-sealer với giá trị bằng địa chỉ của NTF. Nếu 1 địa chỉ đã tồn tại 1 giá trị authorized-sealer thì nó ko thể nhận authorization từ 1 NTF holder nào khác cho đến khi NTF holder đó tạo lệnh withdraw từ authorized-sealer. Lệnh đặt authorized-sealer phải được thực hiện sau khi cài đặt và vận hành sealing node để có thể tham gia vào sealing round tiếp theo. Trường hợp nếu trong 1 sealing round, authorized-sealer không thực hiện 1 sealing activity thì giá trị authorized-sealer sẽ bị withdraw về NTF holder của nó và tất nhiên không được tham gia vào sealing round tiếp theo cho đến khi được authorize trở lại.
+
+\section{Cách thức các sealers đóng block}
+Cách thức đóng Block của DCCS là các sealers sẽ được đánh số từ 1 đến n (gọi là sealing-id) một cách ngẫu nhiên theo từng sealing round: trong đó n là số lượng các authorized-sealers đã được đăng ký.
+
+\subsection{Trường hợp 1} Nếu sealing node không nằm trong recent sealers. Nếu số dư bằng chính sealing-id thì node đó được quyền seal block ngay lập tức. Đối với số dư khác sealing-id, ở mỗi block tiếp theo, các sealing node phải tự xác định thời gian chờ được tính như sau:
+
+\bibliographystyle{plainnat}
+\bibliography{Biblio}
+
+\end{multicols}
+\end{document}
