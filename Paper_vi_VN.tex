@@ -1,6 +1,6 @@
 % !TEX encoding = UTF-8 Unicode
 
-\documentclass[12pt]{amsart}
+\documentclass[12pt,oneside]{amsart}
 \usepackage{cancel}
 \usepackage{xspace}
 \usepackage{graphicx}
@@ -8,7 +8,7 @@
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage[a4paper,width=170mm,top=18mm,bottom=22mm,includeheadfoot]{geometry}
+\usepackage[a4paper,width=165mm,top=20mm,bottom=25mm,includeheadfoot]{geometry}
 \usepackage{array}
 \usepackage{verbatim}
 \usepackage{caption}
@@ -21,8 +21,6 @@
 \usepackage{tikz}
 \usepackage[bookmarks=true, unicode=true, pdftitle={Nexty Yellow Paper: a formal specification of Nexty, a zero transfer fee and instant transfer base on Ethereum blockchain}, pdfauthor={Thanh Dao / Ha Dang},pdfkeywords={Nexty, Ethereum, Yellow Paper, blockchain, virtual machine, cryptography, decentralised, singleton, transaction, generalised, zero transfer fee, instant transfer},pdfborder={0 0 0.5 [1 3]}]{hyperref}
 %,pagebackref=true
-
-\usepackage{tabu} %requires array.
 
 \PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
 
@@ -43,11 +41,11 @@
 %Path relative to the main .tex file 
 \graphicspath{ {./images/} }
 
-\title{NEXTY: AN ALTERNATIVE CONSENSUS TO GET ZERO TRANSFER FEE AND INSTANT TRANSFER FROM ETHEREUM BLOCKCHAIN}
+\title{NEXTY: A CONSENSUS TO GET ZERO TRANSFER FEE AND INSTANT TRANSFER BLOCKCHAIN}
 \author{
-	Thanh Dao / Ha Dang \\
+	Thanh Dao \& Ha Dang \\
 	CO-FOUNDER/CTO NEXTY PLATFORM \\
-	thanhdao@nexty.io
+	thanhdao@nexty.io / dvietha@gmail.com
 }
 \date{} % delete this line to display the current date
 
@@ -138,7 +136,71 @@ Cách thức xây dựng hệ số cho công thức trên được giả định
 \\
 \includegraphics[width=0.48\textwidth, height=4cm]{curve-fit}
 \\
+Mỗi một vòng đóng block của các sealers sẽ được gọi là một epoch. Tuỳ theo số lượng sealer trong chain của từng sealing round mà một epoch sẽ có độ dài khác nhau.
 
+Bằng phương thức tính thời gian chờ cố định cho từng sealers theo công thức  $\eqref{eq:psi}$ và $\eqref{eq:psi_2}$, consensus có thể kiểm tra được xem một sealer; vì lo ngại bị withdraw authorised sealer về NTF holder do không thực hiện sealing activity trong một sealing round mà chiếm quyền sealing block tại một thời điểm nào đó sớm hơn khi chưa đến lượt seal; gây ra sự hỗn loạn và racing for sealing block. Thuật toán đồng thuận của Nexty sẽ thực hiện verify một block được seal bởi một authorized sealer bằng cách kiểm tra lại xem thời gian sinh ra block của authorized-sealer đó có đúng nhỏ hơn thời gian nó phải chờ hay không.
+
+\section{Cách thức trả thưởng cho các sealers}
+
+Cứ sau mỗi sealing round, giá trị thưởng $\Re$ của mỗi sealer sẽ được tính bằng giá trị nhỏ nhất của tổng số lượng thưởng chia cho các active sealers theo tỷ lệ số lượng NTF họ có trên tổng số NTF của những người được làm sealers mà có tham gia quá trình seal.
+
+\begin{eqnarray}
+\theta = \frac{\Omega}{N} \\
+\phi = \frac{\Upsilon_{NTF}}{\Xi_{NTF}}
+\end{eqnarray}
+
+\begin{equation}\label{eq:re}
+\Re \equiv \mathbf{min}(\theta, \phi)
+\end{equation}
+
+\begin{description}
+\item[$\Omega$] total reward
+\item[N] total number of active sealer of the current sealing round
+\item[$\Upsilon_{NTF}$] amount of NTF token that the owner of active sealer is holding
+\item[$\Xi_{NTF}$] total amount of NTF token that all active sealer are holding
+\end{description}
+
+Bằng cách thức tính reward $\Re$ theo công thức $\eqref{eq:re}$, người sở hữu nhiều NTF theo một cách tự nhiên sẽ phân chia NTF của mình ra nhiều ví để trang bị nhiều máy làm sealer, thay vì chỉ build một máy sealer và tập trung quá nhiều NTF vào đó. Điều này đảm bảo Nexty chain sẽ có số lượng node đủ lớn để đảm bảo tính decentralise, tính ổn định và tăng độ chịu tải cho toàn bộ Nexty chain.
+
+Total reward $\Re$ là lượng NTY được sinh ra sau mỗi 1 sealing round, được tính bằng \textit{[số reward sinh ra 1 block]} * \textit{[số block được tạo ra ở sealing round đó]}
+
+Số reward sinh ra cho một block được bằng số reward trong một năm chia cho $\mathbf{15768000}$, số block dự kiến trong vòng một năm với block time được config ban đầu của Nexty chain là 2 giây.
+
+Số lượng reward sinh ra trong một năm được tính theo tỷ lệ sau đây:
+
+\begin{center}
+  \begin{tabular}{@{} cc @{}}
+    \hline
+    Year &  \% of circulating supply \\ 
+    \hline
+    1 & 10 \\ 
+    2 & 5 \\ 
+    3 & 2 \\ 
+    4 & 1 \\ 
+    5 & 1 \\     
+    ... & ... \\ 
+    ... & ... \\ 
+    ... & ... \\ 
+    n &  1 \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\section{Cách thức chống SPAM hệ thống}
+
+Do transaction fee của Nexty là zero nên nếu không có phương thức chống Spam transaction hợp lý thì dễ dàng có thể bị tấn công bằng cách gửi liên tục nhiều giao dịch trong cùng 1 lúc gây ra nghẽn hệ thống.
+
+Chúng tôi đã có phương thức chống spam như sau:
+
+Nguyên tắc chung là hệ thống sẽ thu phí ở giao dịch đầu tiên với mức phí khoảng \textit{0.2 USD/1 tài khoản}, số tiền này sẽ được cộng vào giá trị reward của sealing round. Từ những giao dịch sau đó, hệ thống sẽ không thu phí giao dịch, nhưng yêu cầu các tài khoản đó phải chạy ứng dụng ví liên tục với số lượng block bằng \textit{[0.0015 * gas-used]} thì mới được gửi giao dịch tiếp theo.
+
+Ứng dụng ví của người dùng là một bản light client hay còn gọi là một block verifier (theo chuẩn light client protocol) có chức năng lưu lại những transaction của chính tài khoản đó, những tài khoản bên cạnh trong merkle tree, block number và các block header. Nhiệm vụ của light client là phải verify toàn bộ các thông tin giao dịch liên quan đến nó, cũng như xác thực tính đúng đắn của các block đã được sinh ra và block được sinh ra sau đó. Phải có 1 sự so sánh nếu blockchain bị can thiệp quá 15 block trở về trước thì phải có thông báo tới owner của ví đó rằng có thể hệ thống bị manipulated. Trong trường hợp đó sẽ cần truy cập cộng đồng chung để xem có lỗi nào xảy ra, đồng thời vote down đối với những authorized-sealers đã gây ra tình trạng sai sót đó.
+
+Với nguyên tắc này, một hành động spam phải bỏ ra một lượng tài nguyên hệ thống của nó lớn hơn khoảng 56.7 lần lượng tài nguyên của chain để xác nhận một giao dịch như vậy sẽ làm cho những đối tượng spammer tổn thất nhiều hơn và không còn ý định spam.
+
+Người dùng vẫn có quyền lựa chọn tạo transaction mất phí trong trường hợp họ không muốn duy trì block verifier như thế.
+
+Đối với những dApp, nó có thể tự cung cấp các hệ thống nodes để chịu phần gas của người dùng rồi sau đó có thể có hoặc không thu phí trên phần gas của người dùng tuỳ theo nhu cầu phát triển của dApp đó.
 
 
 \bibliographystyle{plainnat}
