@@ -92,9 +92,13 @@ Sau đó, ``sealing-id'' của từng authorized-sealer sẽ được lấy bằ
 
 Nếu số dư $\sigma_{\mathrm{k}}$ bằng chính ``sealing-id'' của node thì node đó được quyền seal block ngay lập tức. Đối với số dư khác với ``sealing-id'', ở mỗi block tiếp theo, các sealing node phải tự xác định thời gian chờ, $\psi_{\mathrm{k}}$, được tính như sau:
 
-\begin{equation}
+\begin{eqnarray}
+\alpha = 1.387978 \\
+\beta = 0.002313279 \\
+\gamma = 0.00462659 \\
+\delta = 199.9994 \\
 \psi_{\mathrm{k}} \equiv \sum_{i=1}^{\zeta_\mathrm{k}} \mathbf{floor}(\frac{\alpha}{\beta*i+\gamma} + \delta)
-\end{equation}
+\end{eqnarray}
 
 \bibliographystyle{plainnat}
 \bibliography{Biblio}
