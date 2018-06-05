@@ -40,6 +40,9 @@
 
 \definecolor{pagecolor}{rgb}{1,0.98,0.9}
 
+%Path relative to the main .tex file 
+\graphicspath{ {./images/} }
+
 \title{NEXTY: AN ALTERNATIVE CONSENSUS TO GET ZERO TRANSFER FEE AND INSTANT TRANSFER FROM ETHEREUM BLOCKCHAIN}
 \author{
 	Thanh Dao / Ha Dang \\
@@ -87,7 +90,7 @@ Sau đó, ``sealing-id'' của từng authorized-sealer sẽ được lấy bằ
 
 \subsection{Trường hợp 1} Nếu sealing node không nằm trong recent sealers. Node sẽ xác định block tiếp theo có phải là đến lượt nó làm sealer hay không theo công thức sau:
 
-\begin{equation}
+\begin{equation}\label{eq:sigma}
 \sigma_{\mathrm{k}} \equiv (\nu - \mathbf{block}) \ \ \ \mathbf{mod} \ \ \ \Pi
 \end{equation}
 
@@ -100,12 +103,15 @@ Sau đó, ``sealing-id'' của từng authorized-sealer sẽ được lấy bằ
 Nếu số dư $\sigma_{\mathrm{k}}$ bằng chính ``sealing-id'' của node thì node đó được quyền seal block ngay lập tức. Đối với số dư khác với ``sealing-id'', ở mỗi block tiếp theo, các sealing node phải tự xác định thời gian chờ, $\psi_{\mathrm{k}}$, được tính như sau:
 
 \begin{eqnarray}
-\alpha = 1.387978 \\
-\beta = 0.002313279 \\
-\gamma = 0.00462659 \\
-\delta = 199.9994 \\
-\psi_{\mathrm{k}} \equiv \sum_{i=1}^{\zeta_\mathrm{k}} \mathbf{floor}(\frac{\alpha}{\beta*i+\gamma} + \delta)
+\alpha = 001.387978000 \\
+\beta = 000.002313279 \\
+\gamma = 000.004626590 \\
+\delta = 199.999400000
 \end{eqnarray}
+
+\begin{equation}\label{eq:psi}
+\psi_{\mathrm{k}} \equiv \sum_{i=1}^{\zeta_\mathrm{k}} \mathbf{floor}(\frac{\alpha}{\beta*i+\gamma} + \delta)
+\end{equation}
 
 \subsection{Trường hợp 2} Nếu sealing node nằm trong recent sealers
 
@@ -114,16 +120,25 @@ Trường hợp này có thể cho sealers được tiếp tục seal, nhưng ph
 Thời gian chờ $\psi_{\mathrm{k}}$ được theo công thức sau:
 
 \begin{eqnarray}
-\alpha = 1.387978 \\
-\beta = 0.002313279 \\
-\gamma = 0.00462659 \\
-\delta = 199.9994
+\alpha = 001.387978000 \\
+\beta = 000.002313279 \\
+\gamma = 000.004626590 \\
+\delta = 199.999400000
 \end{eqnarray}
 
-\begin{multline}
+\begin{multline}\label{eq:psi_2}
 \psi_{\mathrm{k}} \equiv \sum_{i=1}^{n} \mathbf{floor}(\frac{\alpha}{\beta*i+\gamma} + \delta) \\ 
 + \sum_{i=1}^{\zeta_\mathrm{k}} \mathbf{floor}(\frac{\alpha}{\beta*i+\gamma} + \delta)
 \end{multline}
+
+Cách thức xây dựng hệ số cho công thức trên được giả định như sau. Đối với sealing node có sealing-id trùng với số dư r, được tính theo công thức $\eqref{eq:sigma}$, thì được ưu tiên seal block trước 400ms, sealing node tiếp theo được ưu tiên 350ms, và sau đó lần lượt là 320… cho đến sealing node lớn hơn số dư một khoảng lớn nhất thì xấp xỉ 200ms. Đồ thị của nó sẽ tương ứng với hàm số $\texttt{\small y} = \frac{a} {(b * x + c)} + \texttt{\small d}$
+
+Để ước lượng giá trị cho các tham số của công thức này, chúng tôi sử dụng phương pháp curve fitting để tìm ra hệ số tương đối theo website \href{https://mycurvefit.com/}{My Curve Fit} với phương sai \footnote{R² is 1 minus the ratio of sum of the squares of the residuals divided by the sum of the squares of the differences between Y fit and the mean Y value} xấp xỉ bằng 1.
+\\
+\\
+\includegraphics[width=0.48\textwidth, height=4cm]{curve-fit}
+\\
+
 
 
 \bibliographystyle{plainnat}
