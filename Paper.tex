@@ -54,7 +54,7 @@
 
 \pagecolor{pagecolor}
 \begin{abstract}
-This is the detail technical paper of \href{https://nexty.io}{Nexty Platform}, focusing on describing the operation of a consensus protocol called Proof of Foundation. Proof of Foundation was inspired by the Proof of Authority introduced by \cite{clique} with improvement from \href{https://nexty.io}{Nexty Platform} by introducing a new confirmation system named \textbf{DCCS} - \textbf{D}ual \textbf{C}ryptocurrency \textbf{C}onfirmation \textbf{S}ystem to achieve a absolutely decentralized system and bring a highly incentive system for blockchain maintainers.
+This is the detail technical paper of \href{https://nexty.io}{Nexty Platform}, focusing on describing the operation of a consensus protocol called Proof of Foundation. Proof of Foundation was inspired by the Proof of Authority introduced by \cite{clique} with improvement from \href{https://nexty.io}{Nexty Platform} by introducing a new confirmation system named \textbf{DCCS} - \textbf{D}ual \textbf{C}ryptocurrency \textbf{C}onfirmation \textbf{S}ystem to achieve a decentralized system and bring a highly incentive system for blockchain maintainers.
 \end{abstract}
 
 \maketitle
@@ -70,7 +70,7 @@ In addition to {\small NTY} coin-base, {\small DCCS} has the secondary token nam
 The system will set up a configuration parameter to determine the minimum value, $min-ntf$, that an account need to have to become block sealer. Nexty will build and develop a smart contract, which allow {\small NTF} token holder, having enough token, to grant another account called ``executing-account'' to become the block sealer by setting ``authorized-sealer'' state in the smart contract with the value equal to address of {\small NTF} holder. If an address already has an ``authorized-sealer'' value, it can not receive authorization from another NTF holder until the NTF holder has made the withdrawal it from ``authorized-sealer''. The ``authorized-sealer'' list will be determined at the check point block of each sealing round by reading state from the smart contract at that point of time. If in the current sealing round, any ``authorized-sealer'' does not perform at least one sealing activity, the ``authorized-sealer'' value will be withdrawn to its {\small NTF} holder by updating the state of the smart contract at the checkpoint block number of the next sealing round and of course that ``authorized-sealer'' will not be involved in the next sealing rounds until it will be authorized to become ``authorized-sealer'' again.
 
 \section{Block sealing mechanism}\label{sec:sealing}
-The {\small DCCS} block sealing mechanism will be implemented  as in following steps. Firstly, the sealers will be numbered from $1$ to $n$ (called ``sealing-id'') randomly at the beginning of each sealing round; in which, $n$ is the number of registered ``authorized-sealer'' and is determined by the state of the smart contract at the \textit{checkpoint block number} of the corresponding sealing round. To ensure the randomness of ``sealing-id'', the numbering is calculated by a hash,  $\boldsymbol{\xi_{\mathrm{k}}}$, as following formula when starting a new sealing round.
+The {\small DCCS} block sealing mechanism will be implemented  as in following steps. Firstly, the sealers will be numbered from $0$ to $n - 1$ (called ``sealing-id'') randomly at the beginning of each sealing round; in which, $n$ is the number of registered ``authorized-sealer'' and is determined by the state of the smart contract at the \textit{checkpoint block number} of the corresponding sealing round. To ensure the randomness of ``sealing-id'', the numbering is calculated by a hash,  $\boldsymbol{\xi_{\mathrm{k}}}$, as following formula when starting a new sealing round.
 
 \begin{equation}
 \xi_{\mathrm{k}} \equiv \texttt{\small KEC}(\mathbf{block}, \mathbf{\Lambda_{\mathrm{k}}})
@@ -82,7 +82,7 @@ The {\small DCCS} block sealing mechanism will be implemented  as in following s
 \item[\texttt{\small KEC}] is the \textbf{\small {SHA-3 Keccak-512}} hash function of any input.
 \end{description}
 
-After that, the ``sealing-id'' of each authorized-sealer will be taken by the position of \textit{sealing hash}, $\boldsymbol{\xi_k}$, in the array $(\xi_{\mathrm{1}}, \xi_{\mathrm{2}}, ..., \xi_{\mathrm{n}})$, ascending ordered by the \textit{sealing hash}.
+After that, the ``sealing-id'' of each authorized-sealer will be taken by the position of \textit{sealing hash}, $\boldsymbol{\xi_k}$, in the array $(\xi_{\mathrm{0}}, \xi_{\mathrm{1}}, ..., \xi_{\mathrm{n-1}})$, ascending ordered by the \textit{sealing hash}.
 
 To ensure performance of the system, the ``sealing-id'' of the all authorized sealers will be snapshot only once from the smart contract state at the \textit{checkpoint block number} of each sealing round and stored in the local database as well as in \textbf{lru cache} of each node.
 
