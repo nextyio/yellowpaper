@@ -64,10 +64,10 @@ This is the detail technical paper of \href{https://nexty.io}{Nexty Platform}, f
 %\tableofcontents
 
 \section{Introduction}\label{sec:introduction}
-In addition to {\small NTY} coin-base, {\small DCCS} has the secondary token named {\small NTF}. {\small NTF} is used for authorizing an account to become the maintainer/sealer of the confirmation system described detail in section \ref{sec:authorize}, as well as to calculate reward for block sealer. {\small NTF} token has total supply of $10,000,000$ and will be distributed for the first $100,000,000,000$ NTY holders that joined in ``Smart Staking'' program described detail in the white paper of \cite{smart-taking}. In the other words, {\small NTF} will be rewarded to the pioneers having a clear vision and a strong believe in \href{https://nexty.io}{Nexty Platform} in the future. That's the reason why we call the new consensus protocol as \textit{``Proof of Foundation''}. The power of \href{https://nexty.io}{Nexty Platform}, however, is not belong to {\small NTF} holders because they could be voted down by Nexty community if community found that {\small NTF} holders did any bad behavior of cheating, malicious or hand-shaking to make the network become centralize chain as well as using out-of-date source code. As a result, {\small NTF} holders have the only role as block sealer for Nexty blockchain and governed  by {\small NTY} community via decentralize voting system on a smart contract.
+In addition to {\small NTY} coin-base, {\small DCCS} has the secondary token named {\small NTF}. {\small NTF} is used for authorizing an account to become the maintainer/sealer of the confirmation system described detail in section \ref{sec:authorize}, as well as to calculate reward for block sealer. {\small NTF} token has total supply of $10,000,000$ and will be distributed for the first $100,000,000,000$ NTY holders that joined in ``Smart Staking'' program described detail in the white paper of \cite{smart-taking}. In the other words, {\small NTF} will be rewarded to the pioneers having a clear vision and a strong believe in \href{https://nexty.io}{Nexty Platform} in the future. That's the reason why we call the new consensus protocol as \textit{``Proof of Foundation''}. The power of \href{https://nexty.io}{Nexty Platform}, however, is not belong to {\small NTF} holders because they could be voted down by Nexty community if community found that {\small NTF} holders did any bad behavior of cheating, malicious or hand-shaking to make the network become centralize chain as well as using out-of-date source code. As a result, {\small NTF} holders have the only role as block sealer for Nexty blockchain and governed  by {\small NTY} community via decentralize voting system.
 
 \section{How to authorize an account to become a block sealer}\label{sec:authorize}
-The system will set up a configuration parameter to define the minimum value, $\mathbf{50,000}$ {\small NTF}, that an account need to deposit into Nexty governance smart contract to become a block sealer. Nexty will build and develop a governance smart contract, which allow {\small NTF} token holder, having enough token, to grant another account called ``executing-account'' to become the block sealer by setting ``authorized-sealer'' state in the smart contract with the value equal to address of {\small NTF} holder. If an address already has an ``authorized-sealer'' value, it can not receive authorization from another NTF holder until the NTF holder has made the withdrawal it from ``authorized-sealer''. The ``authorized-sealer'' list will be determined at the check point block of each epoch by reading canonical state from the smart contract at that point of time. If in the current epoch, any ``authorized-sealer'' does not perform at least one sealing activity, the ``authorized-sealer'' value will be withdrawn to its {\small NTF} holder by updating the state of the smart contract at the checkpoint block number of the next epoch and of course that ``authorized-sealer'' will not be involved in the next epoch until it will be authorized to become ``authorized-sealer'' again. We will introduce more detail about this on Nexty governance section later \ref{sec:governace}.
+The system will set up a configuration parameter to define the minimum value, $\mathbf{50,000}$ {\small NTF}, that an account need to deposit into Nexty governance smart contract to become a block sealer. Nexty will build and develop a governance smart contract, which allow {\small NTF} token holder, having enough token, to grant another account called ``executing-account'' to become the block sealer by setting ``authorized-sealer'' state in the smart contract with the value equal to address of {\small NTF} holder. If an address already has an ``authorized-sealer'' value, it can not receive authorization from another NTF holder until the NTF holder has made the withdrawal it from ``authorized-sealer''. The ``authorized-sealer'' list will be determined at the check point block of each epoch by reading canonical state from the smart contract at that point of time. If in the last three epochs, any ``authorized-sealer'' does not perform at least one sealing activity, the ``authorized-sealer'' value will slash by updating the state of the smart contract at the checkpoint block number of the next epoch and of course that ``authorized-sealer'' will not be involved in the next epoch until it will be authorized to become ``authorized-sealer'' again via community voting dapp. We will introduce more detail about this on Nexty governance section later \ref{sec:governace}.
 
 \section{Block sealing mechanism}\label{sec:sealing}
 The {\small DCCS} block sealing mechanism will be implemented  as in following steps. Firstly, the sealers will be numbered from $0$ to $n - 1$ (called ``sealing-id'') randomly at the beginning of each epoch; in which, $n$ is the number of registered ``authorized-sealer'' and is determined by the state of the governance smart contract at the canonical chain from \textit{checkpoint block number} of the corresponding epoch. To ensure the randomness of ``sealing-id'', the numbering is calculated by a hash,  $\boldsymbol{\xi_{\mathrm{k}}}$, as following formula when starting a new epoch.
@@ -207,6 +207,10 @@ A registration contract is added to the Nexty chain to deposit {\small NTF} and 
 \subsection{Sealer authorization}
 When a node starting with --${mine}$ option then they need to unlock the unique \textbf{coinbase} account setting in the activation sealer set. If the \textbf{coinbase} was not found in the current epoch \textbf{activation sealer set} then unauthorization error will be throw and it cannot start mining but they still can continue to sync block preparing for sealing later.
 
+\subsection{Penalized}
+
+At the checkpoint of each epoch, consensus will collect the data from the chain to find out any sealers that didn't seal any blocks 3 epochs in a row. Then to ensure the network healthy, those sealers will be removed out of the \textbf{activation sealer set} in the new epoch and mark sealer's status as {\small PENALIZED}. Because, offline sealers may due to the nature of unstable global network and dis-continue infrastructure service that out of control of the sealers. Then all {\small PENALIZED} sealers then can be unlock the slash after voting up by {\small NTY} community via a specific voting smart contract as well as dapp. 
+
 \section{Block sealer reward calculation}
 
 Reward will be added immediately into sealer’s account balance after sealing a block. The reward for a block is equal to the number of rewards per year divided by $\mathbf{15,768,000}$, the expected number of block within one year (initial configuration of block time is 2 seconds). The amount of rewards of each block sealing in a specific year is calculated in the following proportions:
@@ -231,17 +235,40 @@ Reward will be added immediately into sealer’s account balance after sealing a
 
 \section{Anti-SPAM}\label{sec:spam}
 
-Since Nexty's transaction fee is zero, if there is no proper anti-spam protection, it can easily be attacked by sending multiple transactions simultaneously, causing system blockage.
+\subsection{Most Frequency Use}\label{sec:mfu}
 
-We have the following anti-spam methods:
+In Nexty blockchain, we allow end user to perform transaction with zero fee. Therefore, we introduce a mechanism to priority transactions base on some other factors other than using only the \textbf{gasprice}. The first factor is similar to stamina, each account will have a \textbf{most frequency use} state. whenever, transaction from account to include in the block then the \textbf{most frequency use}, ${\Delta_{new}}$, will be update as following formula.
 
-The general rule is that the system will charge the first transaction with a fee of \textit{0.2 per account}, which will be added to the reward value of the sealing round. From subsequent transactions, the system will not charge transaction fees, but requires those accounts to run a continuous wallet application with the number of blocks equal to \textit{[0.0015 * gas-used]}, after that, they will be able to send next transactions.
+\begin{equation}
+	{\Delta_{new}}  = {\Delta_{old}} + max(1, \frac{(block - {\Delta_{old}}) * GasUsed}{3 * 21000})
+\end{equation}
 
-Mobile wallet app is a light client version, as known as a block verifier (based on light client protocol standard) which has the ability to save transactions of the it's own account and contiguous accounts in \textit{Merkle Tree} and block headers. The responsibility of a light client is to verify all transactional information related to it, as well as validate the blocks generated afterward. There should be a comparison if the blockchain is interfered with more than 15 blocks backwards, then notify to the owner of the wallet that the system might be manipulated. In some case, community must be accessed to see if any errors occurred, and vote down on the ``authorized-sealers'' that caused the malicious data. Under this rule, a spam action that spends more than 56.7 times the amount of resources on the chain to confirm such a transaction. This results in a loss in resources for spammers and therefore, ruins their intention of spamming.
+\begin{description}
+\item[block] is the block number that transaction was include.
+\item[GasUsed] gas used by the transaction
+\end{description}
 
-Users still have the option of creating a charged transaction in case they do not want to maintain block verifier.
+Ideally, the higher \textbf{most frequency use} value, the less priority of the account's transaction in the transaction pool. And each time an account perform the transaction, \textbf{most frequency use} value of that account will be increase; as a result, the next transaction of the same account will be less priority. And to avoid spam by new account, the \textbf{most frequency use} of a new account will be the block number of the account's first transaction.
 
-For \textbf{{\small {dApp}}}, it can provide its own system of nodes to withstand the user's gas and then there may or may not be a charge on the user's gas depending on the development needs of the \textbf{{\small {dApp}}}.
+\subsection{Transaction Parity}\label{sec:parity}
+
+Along with  \textbf{most frequency use} above, we introduce a new factor to decide the priority of the transaction called \textbf{parity} and will be calculated as below
+
+\begin{equation}\label{eq:parity}
+{\rho_t} = {\Delta_{act}} + \frac{TxGasLimit}{21000} - \frac{TxGasPrice}{ParityLimit}
+\end{equation}
+
+\begin{description}
+\item[${\Delta_{act}}$] \textbf{most frequency use} value of the account when perform transaction
+\item[TxGasLimit] transaction gas limit, the higher gas limit transaction, the less priority
+\item[TxGasPrice] transaction gas price, can be input arbitrarily by user. User can put higher gas price if they want to make transaction be confirmed faster.
+\item[ParityLimit] parity limit be configured by miner, the higher parity limit, the less transaction gas price effect into the overall parity value, ${\rho_t}$
+\end{description}
+
+Overall, a transaction was include in the miner's txpool with priority base on the value of transaction parity calculated in formula \eqref{eq:parity} then even though Nexty allow user to send tnx with zero fee but sealer's pool can arbitrarily setting parameters to utilize the sealer's resource for anti spamming transaction and ensure normal user's transaction to be proceed without delay.
+
+\subsection{Transaction Proof of Work}
+In the near future, when the Nexty chain will be fulfilled or be spammed by unmeaning transactions, we will introduce a mechanism to avoid those kind of problem by enforcing user to send a proof of mini work along with the transaction, the transaction with valid proof will be sealed in the block with highest priority. To make a better user experience and adoption, we will develop this feature in user wallet; when the transaction confirmation is too slow, wallet will allow user to take action to do transaction proof of work on their wallet before sending transaction.
 
 \bibliographystyle{plainnat}
 \bibliography{Biblio}
